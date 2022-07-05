@@ -209,12 +209,31 @@ def homepage():
             f"ORDER BY year DESC LIMIT 1"
         )[0][0]
 
+        # Relatorio 5
+        if report == '5':
+            table_title = 'Quantidade de vitórias'
+            fields = ['Ano', 'Corrida', 'Vitórias']
+            rows = db.query(f"SELECT * FROM get_wins('{current_user['id_original']}')")
+
+        # Relatorio 6
+        if report == '6':
+            table_title = 'Quantidade de resultados por cada status'
+            fields = ['Status', 'Contagem']
+            rows = db.query(
+                f"SELECT DISTINCT status.status, COUNT(1) OVER (PARTITION BY status.statusid) AS count "
+                f"FROM results JOIN status ON results.statusid = status.statusid "
+                f"WHERE results.driverid = '{current_user['id_original']}' ORDER BY count DESC"
+            )
+
         return render_template(
             'homepage_driver.html',
             current_user=current_user,
             wins=wins,
             first_reg_year=first_reg_year,
-            last_reg_year=last_reg_year
+            last_reg_year=last_reg_year,
+            table_title=table_title,
+            fields=fields,
+            rows=rows
         )
 
     #----------------------------------------------------------------#

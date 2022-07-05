@@ -22,10 +22,33 @@
 	<table id="pretty" class="table table-striped table-responsive table-bordered">
 		<caption>Relatórios</caption>
 		<tbody>
-			<tr>
-				<td><a href="/relatorio?id=5"><button type="button">5</a></td>
-				<td><a href="/relatorio?id=6"><button type="button">6</a></td>
-			</tr>
+			<tr><td><a href="/?relatorio=5"><button type="button">Quantidade de vitórias</a></td></tr>
+			<tr><td><a href="/?relatorio=6"><button type="button">Quantidade de resultados por cada status</a></td></tr>
 		</tbody>
 	</table>
+
+	{% if fields and rows %}
+		<br><br>
+		<table id="pretty" class="table table-striped table-responsive table-bordered">
+			<caption>{{ table_title }}</caption>
+			<thead>
+					<tr>
+						{% for field in fields %}
+							<th>{{ field }}</th>
+						{% endfor %}
+					</tr>
+				</thead>
+
+				<tbody>
+					{% for row in rows %}
+						<tr>
+							{% for value in row %}
+								<td>{{ value if value else '' }}</td>
+							{% endfor %}
+						</tr>
+					{% endfor %}
+				</tbody>
+		</table>
+		<br><br><br><br>
+	{% endif %}
 {% endblock %}

@@ -55,7 +55,7 @@
 			<thead>
 					<tr>
 						{% for field in fields %}
-							<th>{{ field.title() }}</th>
+							<th>{{ field }}</th>
 						{% endfor %}
 					</tr>
 				</thead>
@@ -64,7 +64,7 @@
 					{% for row in rows %}
 						<tr>
 							{% for value in row %}
-								<td>{{ value }}</td>
+								<td>{{ value if value else '' }}</td>
 							{% endfor %}
 						</tr>
 					{% endfor %}
