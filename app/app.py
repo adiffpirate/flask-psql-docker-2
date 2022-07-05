@@ -20,11 +20,11 @@ def login():
         user = request.form['username']
         password = request.form['password']
         # Checa se um usuário com essa senha existe no banco de dados
-        login_result = db.query(f"SELECT userid, tipo, idoriginal FROM users WHERE login = '{user}' AND password = md5('{password}')")[0]
+        login_result = db.query(f"SELECT userid, tipo, idoriginal FROM users WHERE login = '{user}' AND password = md5('{password}')")
         if login_result:
-            current_user['id'] = login_result[0]
-            current_user['tipo'] = login_result[1]
-            current_user['id_original'] = login_result[2]
+            current_user['id'] = login_result[0][0]
+            current_user['tipo'] = login_result[0][1]
+            current_user['id_original'] = login_result[0][2]
 
             # Seta o nome do usuário de acordo seu tipo
             if current_user['tipo'] == 'Administrador':
@@ -150,6 +150,27 @@ def homepage():
             else:
                 message = 'Não existe um piloto com esse nome que já tenha corrido pela sua escuderia'
 
+        # Relatorio 3
+        order = request.args.get("ordem")
+        if report == '3' and order == 'vitorias':
+            table_title = 'Listagem de pilotos (ordernado pela quantidade de vitórias)'
+            fields = ['Piloto', 'Quantidade de Vitórias']
+            rows = db.query(f"SELECT * FROM list_drivers('{current_user['id_original']}') ORDER BY wins DESC")
+        elif report == '3':
+            table_title = 'Listagem de pilotos (em ordem alfabética)'
+            fields = ['Piloto', 'Quantidade de Vitórias']
+            rows = db.query(f"SELECT * FROM list_drivers('{current_user['id_original']}') ORDER BY name")
+
+        # Relatorio 4
+        if report == '4':
+            table_title = 'Quantidade de resultados por cada status'
+            fields = ['Status', 'Contagem']
+            rows = db.query(
+                f"SELECT DISTINCT status.status, COUNT(1) OVER (PARTITION BY status.statusid) AS count "
+                f"FROM results JOIN status ON results.statusid = status.statusid "
+                f"WHERE results.constructorid = '{current_user['id_original']}' ORDER BY count DESC"
+            )
+
         return render_template(
             'homepage_constructor.html',
             current_user=current_user,
@@ -158,7 +179,10 @@ def homepage():
             first_reg_year=first_reg_year,
             last_reg_year=last_reg_year,
             message=message,
-            results=results
+            results=results,
+            table_title=table_title,
+            fields=fields,
+            rows=rows
         )
 
     #--------------------#
