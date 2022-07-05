@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block main %}
+	<table id="pretty" class="table table-striped table-responsive table-bordered">
+		<caption>Overview</caption>
+		<tbody>
+			<tr>
+				<th>Vitórias</th>
+				<th>Ano do primeiro registro</th>
+				<th>Ano do último registro</th>
+			</tr>
+			<tr>
+				<td>{{ wins }}</td>
+				<td>{{ first_reg_year }}</td>
+				<td>{{ last_reg_year }}</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<br><br><br><br>
+
+	<table id="pretty" class="table table-striped table-responsive table-bordered">
+		<caption>Relatórios</caption>
+		<tbody>
+			<tr>
+				<td><a href="/relatorio?id=5"><button type="button">5</a></td>
+				<td><a href="/relatorio?id=6"><button type="button">6</a></td>
+			</tr>
+		</tbody>
+	</table>
+{% endblock %}

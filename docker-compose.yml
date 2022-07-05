@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+
+  app:
+    build:
+      context: app
+      args:
+        PYTHON_VERSION: $APP_PYTHON_VERSION
+    environment:
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_DATABASE: $DB_DATABASE
+      DB_HOST: "db"
+      DB_PORT: $DB_PORT
+    ports:
+      - target: 5000
+        published: $APP_PORT
+        mode: host
+    depends_on:
+      - db_init
+
+  db_init:
+    build:
+      context: database/init
+    environment:
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_DATABASE: $DB_DATABASE
+      DB_HOST: "db"
+      DB_PORT: $DB_PORT
+    depends_on:
+      - db
+    volumes:
+      - db_init_control:/.init_control
+
+  db:
+    build:
+      context: database
+      args:
+        DB_VERSION: $DB_VERSION
+    environment:
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_USER: $DB_USER
+      POSTGRES_DB: $DB_DATABASE
+    ports:
+      - target: 5432
+        published: $DB_PORT
+        mode: host
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+  db_init_control:

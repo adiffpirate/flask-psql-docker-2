@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+
+  app:
+    environment:
+      FLASK_ENV: 'development'
+    volumes:
+      - ./app:/app
+
+  db_admin:
+    image: dpage/pgadmin4:$DB_ADMIN_VERSION
+    environment:
+      PGADMIN_DEFAULT_EMAIL: $DB_ADMIN_EMAIL
+      PGADMIN_DEFAULT_PASSWORD: $DB_ADMIN_PASSWORD
+    ports:
+      - target: 80
+        published: $DB_ADMIN_PORT
+        mode: host
+    depends_on:
+      - db
+    volumes:
+      - db_admin_data:/var/lib/pgadmin
+
+volumes:
+  db_admin_data:

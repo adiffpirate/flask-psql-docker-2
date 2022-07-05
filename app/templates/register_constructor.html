@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block main %}
+	<div class="container">
+		<h1>Cadastrar Escuderia</h1>
+		<br>
+		<form action="" method="post">
+			<label for="constructorref">ConstructorRef</label><br>
+			<input type="text" name="constructorref" value="{{ request.form.constructorref }}"><br><br>
+			<label for="name">Name</label><br>
+			<input type="text" name="name" value="{{ request.form.name }}"><br><br>
+			<label for="nationality">Nationality</label><br>
+			<input type="text" name="nationality" value="{{ request.form.nationality }}"><br><br>
+			<label for="url">URL</label><br>
+			<input type="text" name="url" value="{{ request.form.url }}"><br><br>
+			<input class="btn btn-default" type="submit" value="Cadastrar">
+		</form>
+		{% if message %}
+			<p><strong>{{ message }}</strong>
+		{% endif %}
+	</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block main %}
+	<div class="container">
+		<h1>Cadastrar Escuderia</h1>
+		<br>
+		<form action="" method="post">
+			<label for="driverref">DriverRef</label><br>
+			<input type="text" name="driverref" value="{{ request.form.driverref }}"><br><br>
+			<label for="number">Number</label><br>
+			<input type="text" name="number" value="{{ request.form.number }}"><br><br>
+			<label for="code">Code</label><br>
+			<input type="text" name="code" value="{{ request.form.code }}"><br><br>
+			<label for="forename">Forename</label><br>
+			<input type="text" name="forename" value="{{ request.form.forename }}"><br><br>
+			<label for="surname">Surname</label><br>
+			<input type="text" name="surname" value="{{ request.form.surname }}"><br><br>
+			<label for="dateofbirth">Date of Birth</label><br>
+			<input type="text" placeholder="1990-12-31" name="dateofbirth" value="{{ request.form.dateofbirth }}"><br><br>
+			<label for="nationality">Nationality</label><br>
+			<input type="text" name="nationality" value="{{ request.form.nationality }}"><br><br>
+			<input class="btn btn-default" type="submit" value="Cadastrar">
+		</form>
+		{% if message %}
+			<p><strong>{{ message }}</strong>
+		{% endif %}
+	</div>
+{% endblock %}
