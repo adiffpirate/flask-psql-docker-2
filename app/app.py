@@ -59,6 +59,7 @@ def homepage():
     fields = list()
     rows = list()
     report = request.args.get("relatorio")
+    report_message = ''
 
     #---------------------------#
     # Homepage do Administrador #
@@ -116,23 +117,27 @@ def homepage():
             f"SELECT COUNT(1) FROM results "
             f"WHERE constructorid = '{current_user['id_original']}'"
             f"AND position = 1"
-        )[0][0]
+        )
+        wins = wins[0][0] if wins else ''
         drivers_amount = db.query(
             f"SELECT COUNT(DISTINCT driverid) FROM results "
             f"WHERE constructorid = '{current_user['id_original']}'"
-        )[0][0]
+        )
+        drivers_amount = drivers_amount[0][0] if drivers_amount else ''
         first_reg_year = db.query(
             f"SELECT year FROM races "
             f"JOIN results ON races.raceid = results.raceid "
             f"WHERE results.constructorid = '{current_user['id_original']}' "
             f"ORDER BY year ASC LIMIT 1"
-        )[0][0]
+        )
+        first_reg_year = first_reg_year[0][0] if first_reg_year else ''
         last_reg_year = db.query(
             f"SELECT year FROM races "
             f"JOIN results ON races.raceid = results.raceid "
             f"WHERE results.constructorid = '{current_user['id_original']}' "
             f"ORDER BY year DESC LIMIT 1"
-        )[0][0]
+        )
+        last_reg_year = last_reg_year[0][0] if last_reg_year else ''
 
         # Uma requisição POST aqui é uma consulta de piloto
         if request.method == 'POST':
@@ -140,7 +145,7 @@ def homepage():
             query_result = db.query(
                 f"SELECT forename, surname, dob, nationality FROM driver "
                 f"WHERE LOWER(forename) = LOWER('{forename}') "
-                f"AND EXISTS (SELECT 1 FROM results WHERE driverid = driver.driverid)"
+                f"AND EXISTS (SELECT 1 FROM results WHERE driverid = driver.driverid AND constructorid = '{current_user['id_original']}')"
             )
             if query_result:
                 results['forename'] = query_result[0][0]
@@ -195,19 +200,22 @@ def homepage():
             f"SELECT COUNT(1) FROM results "
             f"WHERE driverid = '{current_user['id_original']}'"
             f"AND position = 1"
-        )[0][0]
+        )
+        wins = wins[0][0] if wins else ''
         first_reg_year = db.query(
             f"SELECT year FROM races "
             f"JOIN results ON races.raceid = results.raceid "
             f"WHERE results.driverid = '{current_user['id_original']}' "
             f"ORDER BY year ASC LIMIT 1"
-        )[0][0]
+        )
+        first_reg_year = first_reg_year[0][0] if first_reg_year else ''
         last_reg_year = db.query(
             f"SELECT year FROM races "
             f"JOIN results ON races.raceid = results.raceid "
             f"WHERE results.driverid = '{current_user['id_original']}' "
             f"ORDER BY year DESC LIMIT 1"
-        )[0][0]
+        )
+        last_reg_year = last_reg_year[0][0] if last_reg_year else ''
 
         # Relatorio 5
         if report == '5':
