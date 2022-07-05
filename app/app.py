@@ -54,23 +54,64 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 def homepage():
     message = ''
-    results = {}
+    results = dict()
+    table_title = ''
+    fields = list()
+    rows = list()
+    report = request.args.get("relatorio")
+
+    #---------------------------#
+    # Homepage do Administrador #
+    #---------------------------#
 
     if current_user['tipo'] == 'Administrador':
+        # Overview
         driver_amount = db.query(f"SELECT COUNT(1) FROM driver")[0][0]
         constructors_amount = db.query(f"SELECT COUNT(1) FROM constructors")[0][0]
         races_amount = db.query(f"SELECT COUNT(1) FROM races")[0][0]
         seasons_amount = db.query(f"SELECT COUNT(1) FROM seasons")[0][0]
+
+        # Relatorio 1
+        if report == '1':
+            table_title = 'Quantidade de resultados por cada status'
+            fields = ['Status', 'Contagem']
+            rows = db.query(
+                f"SELECT DISTINCT status.status, COUNT(1) OVER (PARTITION BY status.statusid) AS count "
+                f"FROM results JOIN status ON results.statusid = status.statusid ORDER BY count DESC"
+            )
+
+        # Relatorio 2
+        if report == '2':
+            city = request.args.get("cidade")
+            table_title = 'Aeroportos brasileiros nas proximidades'
+            fields = [
+                'Nome da Cidade',
+                'Código IATA do Aeroporto',
+                'Nome do Aeroporto',
+                'Cidade do Aeroporto',
+                'Distância',
+                'Tipo do Aeroporto'
+            ]
+            rows = db.query(f"SELECT * FROM airports_near_city('{city}', 100000) ORDER BY distance")
+
         return render_template(
             'homepage_admin.html',
             current_user=current_user,
             driver_amount=driver_amount,
             constructors_amount=constructors_amount,
             races_amount=races_amount,
-            seasons_amount=seasons_amount
+            seasons_amount=seasons_amount,
+            table_title=table_title,
+            fields=fields,
+            rows=rows
         )
 
+    #-----------------------#
+    # Homepage da Escuderia #
+    #-----------------------#
+
     elif current_user['tipo'] == 'Escuderia':
+        # Overview
         wins = db.query(
             f"SELECT COUNT(1) FROM results "
             f"WHERE constructorid = '{current_user['id_original']}'"
@@ -92,6 +133,7 @@ def homepage():
             f"WHERE results.constructorid = '{current_user['id_original']}' "
             f"ORDER BY year DESC LIMIT 1"
         )[0][0]
+
         # Uma requisição POST aqui é uma consulta de piloto
         if request.method == 'POST':
             forename = request.form['forename']
@@ -107,6 +149,7 @@ def homepage():
                 results['nationality'] = query_result[0][3]
             else:
                 message = 'Não existe um piloto com esse nome que já tenha corrido pela sua escuderia'
+
         return render_template(
             'homepage_constructor.html',
             current_user=current_user,
@@ -118,7 +161,12 @@ def homepage():
             results=results
         )
 
+    #--------------------#
+    # Homepage do Piloto #
+    #--------------------#
+
     elif current_user['tipo'] == 'Piloto':
+        # Overview
         wins = db.query(
             f"SELECT COUNT(1) FROM results "
             f"WHERE driverid = '{current_user['id_original']}'"
@@ -136,6 +184,7 @@ def homepage():
             f"WHERE results.driverid = '{current_user['id_original']}' "
             f"ORDER BY year DESC LIMIT 1"
         )[0][0]
+
         return render_template(
             'homepage_driver.html',
             current_user=current_user,
@@ -143,6 +192,10 @@ def homepage():
             first_reg_year=first_reg_year,
             last_reg_year=last_reg_year
         )
+
+    #----------------------------------------------------------------#
+    # Se usuário não for um dos 3 redireciona para a página de login #
+    #----------------------------------------------------------------#
 
     else:
         return redirect(url_for('login'))
